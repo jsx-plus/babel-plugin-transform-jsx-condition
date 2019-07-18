@@ -6,16 +6,32 @@ Support of transform jsx condition directive.
 
 **In**
 
-```js
+```jsx
 // input code
+<View x-if={condition}>First</View>
+<View x-elseif={another}>Second</View>
+<View x-else>Third</View>
 ```
 
 **Out**
 
-```js
-"use strict";
-
-// output code
+```jsx
+{
+  createCondition([
+    [
+      () => condition,
+      () => <View}>First</View>
+    ],
+    [
+      () => another,
+      () => <View}>Second</View>
+    ],
+    [
+      () => true,
+      () => <View}>Third</View>
+    ],
+  ])
+}
 ```
 
 ## Installation
