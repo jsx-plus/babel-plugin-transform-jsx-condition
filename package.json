@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "0.1.1",
   "name": "babel-plugin-transform-jsx-condition",
   "description": "Support of transform jsx condition directive.",
   "repository": "jsx-plus/babel-plugin-transform-jsx-condition",
