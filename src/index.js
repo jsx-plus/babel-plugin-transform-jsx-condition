@@ -55,7 +55,10 @@ export default function({ types: t }) {
             nextJSXElPath = nextJSXElPath.getSibling(nextJSXElPath.key + 1);
             if (nextJSXElPath.isJSXText() && nextJSXElPath.node.value.trim() === '') {
               continueSearch = true;
-            } else if (nextJSXElPath.isJSXElement() && (nextJSXElCondition = getCondition(nextJSXElPath.node))) {
+            } else if (nextJSXElPath.isJSXElement() &&
+            (nextJSXElCondition = getCondition(nextJSXElPath.node)) &&
+            nextJSXElCondition.type !== directiveIf
+            ) {
               conditions.push({
                 condition: nextJSXElCondition.type === directiveElseif
                   ? nextJSXElCondition.value
@@ -64,7 +67,7 @@ export default function({ types: t }) {
               });
               nextJSXElPath.node.openingElement.attributes.splice(nextJSXElCondition.index, 1);
               nextJSXElPath.remove()
-              continueSearch = true;
+              continueSearch = nextJSXElCondition.type === directiveElseif;
             } else {
               continueSearch = false;
             }
