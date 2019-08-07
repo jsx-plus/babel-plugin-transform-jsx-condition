@@ -13,17 +13,19 @@ export default function({ types: t }) {
     if (t.isJSXOpeningElement(jsxElement.openingElement)) {
       const { attributes } = jsxElement.openingElement;
       for (let i = 0, l = attributes.length; i < l; i++) {
-        switch (attributes[i].name.name) {
-          case directiveIf:
-          case directiveElseif:
-          case directiveElse:
-            return {
-              type: attributes[i].name.name,
-              value: t.isJSXExpressionContainer(attributes[i].value)
-                ? attributes[i].value.expression
-                : attributes[i].value,
-              index: i,
-            };
+        if (t.isJSXAttribute(attributes[i])) {
+          switch (attributes[i].name.name) {
+            case directiveIf:
+            case directiveElseif:
+            case directiveElse:
+              return {
+                type: attributes[i].name.name,
+                value: t.isJSXExpressionContainer(attributes[i].value)
+                  ? attributes[i].value.expression
+                  : attributes[i].value,
+                index: i,
+              };
+          }
         }
       }
     }
