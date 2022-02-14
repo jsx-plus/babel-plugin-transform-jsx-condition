@@ -32,5 +32,5 @@ function Foo(props) {
       </View>
       <View x-else>Third</View>
     </View>
-  );
+  )
 }
