@@ -80,7 +80,6 @@ export default function({ types: t }) {
     let nextJSXElCondition;
     if (path.isJSXElement()) {
       nextJSXElCondition = getCondition(path.node);
-      console.log(nextJSXElCondition.type);
       if (nextJSXElCondition.type !== directiveIf) {
         return true;
       }
