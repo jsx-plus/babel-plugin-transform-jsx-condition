@@ -37,39 +37,30 @@ export default function({ types: t }) {
    */
 
   function isDirectiveIf(condition) {
-    if (
+    return (
       condition !== null &&
       condition.value !== null &&
       condition.type === directiveIf
-    ) {
-      return true;
-    }
-    return false;
+    );
   }
 
   /**
    * Check if the node is an empty text node
    */
 
-  function isEmptyTextNode(path) {
-    if (path.isJSXText() && path.node.value.trim() === "") {
-      return true;
-    }
-    return false;
+  function isEmptyTextNode(node) {
+    return t.isJSXText(node) && node.value.trim() === "";
   }
 
   /**
    * Check if the node is a comment node
    */
 
-  function isCommentNode(path) {
-    if (
-      path.isJSXExpressionContainer() &&
-      path.node.expression.type === "JSXEmptyExpression"
-    ) {
-      return true;
-    }
-    return false;
+  function isCommentExpressionContainer(node) {
+    return (
+      t.isJSXExpressionContainer(node) &&
+      t.isJSXEmptyExpression(node.expression)
+    );
   }
 
   /**
@@ -115,8 +106,8 @@ export default function({ types: t }) {
           do {
             nextJSXElPath = nextJSXElPath.getSibling(nextJSXElPath.key + 1);
             if (
-              isEmptyTextNode(nextJSXElPath) ||
-              isCommentNode(nextJSXElPath)
+              isEmptyTextNode(nextJSXElPath.node) ||
+              isCommentExpressionContainer(nextJSXElPath.node)
             ) {
               // if the nextJSXElPath node is an empty text node or a comment node, keep looping
               continueSearch = true;
