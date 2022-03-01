@@ -32,15 +32,65 @@ export default function({ types: t }) {
     return null;
   }
 
+  /**
+   * Check if the condition is if 
+   */
+
+  function isDirectiveIf(condition) {
+    return (
+      condition !== null &&
+      condition.value !== null &&
+      condition.type === directiveIf
+    );
+  }
+
+  /**
+   * Check if the node is an empty text node
+   */
+
+  function isEmptyTextNode(node) {
+    return t.isJSXText(node) && node.value.trim() === "";
+  }
+
+  /**
+   * Check if the node is a comment node
+   */
+
+  function isCommentExpressionContainer(node) {
+    return (
+      t.isJSXExpressionContainer(node) &&
+      t.isJSXEmptyExpression(node.expression)
+    );
+  }
+
+  /**
+   * Check if the condition is elseif or else
+   */
+
+  function isDirectiveElseifOrElse(path) {
+    let nextJSXElCondition;
+    if (path.isJSXElement()) {
+      nextJSXElCondition = getCondition(path.node);
+      if (nextJSXElCondition.type !== directiveIf) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   return {
     visitor: {
       Program(path) {
         path.__conditionHelperImported = false;
       },
+      /**
+       * Process the JSXElement
+       */
       JSXElement(path) {
         const { node, parentPath } = path;
         const condition = getCondition(node);
-        if (condition !== null && condition.value !== null && condition.type === directiveIf) {
+        if (isDirectiveIf(condition)) {
+          // Every time an if is encountered, it is processed
           const { type, value, index } = condition;
           const conditions = [];
 
@@ -55,12 +105,15 @@ export default function({ types: t }) {
           let nextJSXElCondition;
           do {
             nextJSXElPath = nextJSXElPath.getSibling(nextJSXElPath.key + 1);
-            if (nextJSXElPath.isJSXText() && nextJSXElPath.node.value.trim() === '') {
-              continueSearch = true;
-            } else if (nextJSXElPath.isJSXElement() &&
-            (nextJSXElCondition = getCondition(nextJSXElPath.node)) &&
-            nextJSXElCondition.type !== directiveIf
+            if (
+              isEmptyTextNode(nextJSXElPath.node) ||
+              isCommentExpressionContainer(nextJSXElPath.node)
             ) {
+              // if the nextJSXElPath node is an empty text node or a comment node, keep looping
+              continueSearch = true;
+            } else if (isDirectiveElseifOrElse(nextJSXElPath)) {
+              // if the condition type of nextJSXElPath node is elseif, add condition to conditions；otherwise defaults to true
+              nextJSXElCondition = getCondition(nextJSXElPath.node);
               conditions.push({
                 condition: nextJSXElCondition.type === directiveElseif
                   ? nextJSXElCondition.value
@@ -69,6 +122,7 @@ export default function({ types: t }) {
               });
               nextJSXElPath.node.openingElement.attributes.splice(nextJSXElCondition.index, 1);
               nextJSXElPath.remove()
+              // continue the loop when encountering elseif
               continueSearch = nextJSXElCondition.type === directiveElseif;
             } else {
               continueSearch = false;
@@ -91,6 +145,7 @@ export default function({ types: t }) {
           }
 
           const rootPath = path.findParent(p => p.isProgram());
+          // help to generate code after escaping: import { createCondition as __create_condition__ } from "babel-runtime-jsx-plus";
           if (rootPath.__conditionHelperImported === false) {
             const imported = t.identifier(helperImportedName);
             const local = t.identifier(helperLocalName);
