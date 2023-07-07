@@ -84,8 +84,8 @@ export default function({ types: t }) {
           }));
 
           const callExp = t.callExpression(t.identifier(helperLocalName), [arrayExp]);
-          // <></>类型为JSXFragment 但是Fragment还是JSXElement
-          if (parentPath.isJSXElement() || parentPath.type === 'JSXFragment') {
+          // note that `<></>` type is JSXFragment, `Fragment` type is still JSXElement
+          if (parentPath.isJSXElement() || parentPath.isJSXFragment()) {
             path.replaceWith(t.jsxExpressionContainer(callExp));
           } else {
             path.replaceWith(callExp);
