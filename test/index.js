@@ -15,15 +15,21 @@ describe('', () => {
       const fixtureDir = path.join(fixturesDir, caseName);
       const actualPath = path.join(fixtureDir, 'actual.js');
       const actual = transformFileSync(actualPath, {
-        plugins: [[plugin, {}]],
+        plugins: [
+          [plugin, {}],
+          [
+            'babel-plugin-transform-jsx-fragment',
+            { moduleName: 'react', ignoreModuleCheck: true },
+          ],
+        ],
         parserOpts: {
-          plugins: ['jsx']
+          plugins: ['jsx'],
         },
       }).code;
 
-      const expected = fs.readFileSync(
-        path.join(fixtureDir, 'expected.js')
-      ).toString();
+      const expected = fs
+        .readFileSync(path.join(fixtureDir, 'expected.js'))
+        .toString();
 
       assert.equal(trim(actual), trim(expected));
     });
