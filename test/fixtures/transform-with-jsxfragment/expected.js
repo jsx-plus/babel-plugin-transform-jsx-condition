@@ -1,4 +1,4 @@
- import { createCondition as __create_condition__ } from "babel-runtime-jsx-plus";
+import { createCondition as __create_condition__ } from "babel-runtime-jsx-plus";
 import { Fragment } from "react";
 import { createElement } from 'react';
 function Foo(props) {
