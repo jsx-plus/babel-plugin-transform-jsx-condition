@@ -26,7 +26,7 @@ describe('', () => {
           plugins: ['jsx'],
         },
       }).code;
-console.log('actual\n', actual)
+
       const expected = fs
         .readFileSync(path.join(fixtureDir, 'expected.js'))
         .toString();
