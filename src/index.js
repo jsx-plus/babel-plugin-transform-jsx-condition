@@ -54,6 +54,9 @@ export default function({ types: t }) {
           let nextJSXElPath = path;
           let nextJSXElCondition;
           do {
+            // Path to get sibling path must contains parent.
+            if (!nextJSXElPath.parent) continue;
+
             nextJSXElPath = nextJSXElPath.getSibling(nextJSXElPath.key + 1);
             if (nextJSXElPath.isJSXText() && nextJSXElPath.node.value.trim() === '') {
               continueSearch = true;
